@@ -1,0 +1,83 @@
+// Three variant automations + initialization. 30 actual seconds = 10 simulated minutes.
+var java.util.LinkedList<Long> bearingTimestamps = new java.util.LinkedList<Long>()
+var java.util.LinkedList<Double> bearingSamples = new java.util.LinkedList<Double>()
+
+rule "Initialize thresholds"
+when
+    System reached start level 70
+then
+    if (!(WarningThreshold.state instanceof Number)) WarningThreshold.postUpdate(4.5)
+    if (!(CriticalThreshold.state instanceof Number)) CriticalThreshold.postUpdate(7.1)
+    VibrationAlarm.postUpdate(OFF)
+    LubricationAlarm.postUpdate(OFF)
+    AlarmMessage.postUpdate("Система працює, очікування телеметрії")
+end
+
+rule "1. ISO 20816 vibration thresholds, stop and warning"
+when
+    Item Vibration received update
+then
+    if (!(Vibration.state instanceof Number)) return;
+    val double rms = (Vibration.state as Number).doubleValue
+    val double warn = if (WarningThreshold.state instanceof Number) (WarningThreshold.state as Number).doubleValue else 4.5
+    val double danger = if (CriticalThreshold.state instanceof Number) (CriticalThreshold.state as Number).doubleValue else 7.1
+    if (rms > danger) {
+        if (VibrationAlarm.state != ON) {
+            VibrationAlarm.postUpdate(ON)
+            AlarmMessage.postUpdate("Аварійна вібрація — STOP")
+            logWarn("IIoT", "RMS vibration {} mm/s: emergency stop", rms)
+        }
+        if (EmergencyStop.state != ON) EmergencyStop.sendCommand(ON)
+        if (TowerColor.state.toString != "RED") TowerColor.sendCommand("RED")
+    } else if (rms > warn) {
+        if (EmergencyStop.state != ON) {
+            if (TowerColor.state.toString != "YELLOW") TowerColor.sendCommand("YELLOW")
+            AlarmMessage.postUpdate("Попередження: підвищена вібрація")
+        }
+    } else {
+        if (EmergencyStop.state != ON) {
+            if (VibrationAlarm.state != OFF) VibrationAlarm.postUpdate(OFF)
+            if (LubricationAlarm.state != ON && TowerColor.state.toString != "GREEN") TowerColor.sendCommand("GREEN")
+        }
+    }
+end
+
+rule "2. Bearing temperature increase over 10 accelerated minutes"
+when
+    Item BearingTemp received update
+then
+    if (!(BearingTemp.state instanceof Number)) return;
+    val long nowMs = now.toInstant.toEpochMilli
+    val double t = (BearingTemp.state as Number).doubleValue
+    bearingTimestamps.add(nowMs)
+    bearingSamples.add(t)
+    if (bearingTimestamps.size > 1 && nowMs - bearingTimestamps.getFirst >= 30000) {
+        val double diff = t - bearingSamples.getFirst
+        if (diff > 5.0 && LubricationAlarm.state != ON) {
+            LubricationAlarm.postUpdate(ON)
+            AlarmMessage.postUpdate("Перевірити змащення: нагрів понад 5 °C за 10 хв")
+            logWarn("IIoT", "Bearing +{} Celsius / 10 sim minutes", diff)
+            if (EmergencyStop.state != ON && TowerColor.state.toString != "YELLOW") TowerColor.sendCommand("YELLOW")
+        }
+    }
+    while (bearingTimestamps.size > 1 && nowMs - bearingTimestamps.getFirst >= 30000) {
+        bearingTimestamps.removeFirst
+        bearingSamples.removeFirst
+    }
+    if (t < 50.0 && LubricationAlarm.state == ON) LubricationAlarm.postUpdate(OFF)
+end
+
+rule "3. Parts, downtime and production KPI per accelerated shift"
+when
+    Item PartsShift received update or
+    Item ShiftDowntime received update or
+    Item ShiftId received update
+then
+    if (!(PartsShift.state instanceof Number) || !(ShiftDowntime.state instanceof Number) || !(ShiftId.state instanceof Number)) return;
+    val int qty = (PartsShift.state as Number).intValue
+    val double downtime = (ShiftDowntime.state as Number).doubleValue
+    val int shift = (ShiftId.state as Number).intValue
+    val double performance = Math::min(100.0, qty * 100.0 / 40.0)
+    ShiftEfficiency.postUpdate(performance)
+    ShiftSummary.postUpdate("Зміна " + shift + ": " + qty + " деталей; простій " + downtime + " хв")
+end

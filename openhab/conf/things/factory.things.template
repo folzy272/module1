@@ -1,0 +1,22 @@
+Bridge mqtt:broker:factory "Factory secure TLS MQTT" [host="mosquitto",port=8883,secure=true,hostnameValidated=true,username="openhab",password="@PASSWORD@",clientID="openhab-iiot",qos=1,enableDiscovery=false] {
+  Thing topic factory "Industrial machine" {
+    Channels:
+      Type number : vibration [stateTopic="iiot/line1/vibration/telemetry",transformationPattern="JSONPATH:$.value"]
+      Type number : bearing [stateTopic="iiot/line1/bearing/telemetry",transformationPattern="JSONPATH:$.value"]
+      Type number : current [stateTopic="iiot/line1/current/telemetry",transformationPattern="JSONPATH:$.value"]
+      Type number : parts [stateTopic="iiot/line1/parts/telemetry",transformationPattern="JSONPATH:$.value"]
+      Type number : partsShift [stateTopic="iiot/line1/parts/telemetry",transformationPattern="JSONPATH:$.shift_count"]
+      Type number : shiftId [stateTopic="iiot/line1/parts/telemetry",transformationPattern="JSONPATH:$.shift_id"]
+      Type string : machineState [stateTopic="iiot/line1/machine/telemetry",transformationPattern="JSONPATH:$.value"]
+      Type number : downtime [stateTopic="iiot/line1/machine/telemetry",transformationPattern="JSONPATH:$.downtime_minutes"]
+      Type string : tower [stateTopic="iiot/line1/tower/state",transformationPattern="JSONPATH:$.state",commandTopic="iiot/line1/tower/set",formatBeforePublish="{\"state\":\"%s\"}",qos=1]
+      Type switch : estop [stateTopic="iiot/line1/estop/state",transformationPattern="JSONPATH:$.state",commandTopic="iiot/line1/estop/set",formatBeforePublish="{\"state\":\"%s\"}",on="ON",off="OFF",qos=1]
+      Type string : vibrationStatus [stateTopic="iiot/line1/vibration/status"]
+      Type string : bearingStatus [stateTopic="iiot/line1/bearing/status"]
+      Type string : currentStatus [stateTopic="iiot/line1/current/status"]
+      Type string : partsStatus [stateTopic="iiot/line1/parts/status"]
+      Type string : machineStatus [stateTopic="iiot/line1/machine/status"]
+      Type string : towerStatus [stateTopic="iiot/line1/tower/status"]
+      Type string : estopStatus [stateTopic="iiot/line1/estop/status"]
+  }
+}

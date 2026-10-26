@@ -1,0 +1,40 @@
+sitemap factory label="IIoT — верстат (варіант 4)" {
+    Frame label="Показники Modbus TCP → MQTT" {
+        Text item=MachineState
+        Text item=Vibration
+        Text item=BearingTemp
+        Text item=MotorCurrent
+        Text item=PartsTotal
+        Text item=VibStatus
+    }
+    Frame label="Автоматизація і керування" {
+        Text item=TowerColor
+        Text item=VibrationAlarm
+        Text item=LubricationAlarm
+        Text item=AlarmMessage
+        Switch item=EmergencyStop mappings=[ON="Аварійно зупинити",OFF="Скинути STOP"]
+        Selection item=TowerColor mappings=[GREEN="Зелений",YELLOW="Жовтий",RED="Червоний"]
+        Setpoint item=WarningThreshold minValue=1 maxValue=10 step=0.1
+        Setpoint item=CriticalThreshold minValue=2 maxValue=15 step=0.1
+    }
+    Frame label="Зміна: 120 секунд = 8 годин" {
+        Text item=ShiftId
+        Text item=PartsShift
+        Text item=ShiftDowntime
+        Text item=ShiftEfficiency
+        Text item=ShiftSummary
+    }
+    Frame label="Графіки" {
+        Chart item=Vibration period=h refresh=5000 service="rrd4j"
+        Chart item=BearingTemp period=h refresh=5000 service="rrd4j"
+    }
+    Frame label="Доступність усіх пристроїв (retain / LWT)" {
+        Text item=VibStatus
+        Text item=BearingStatus
+        Text item=CurrentStatus
+        Text item=PartsStatus
+        Text item=MachineStatus
+        Text item=TowerStatus
+        Text item=EstopStatus
+    }
+}

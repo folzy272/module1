@@ -1,0 +1,31 @@
+user sensor_vibration
+topic write iiot/line1/vibration/telemetry
+topic write iiot/line1/vibration/status
+user sensor_bearing
+topic write iiot/line1/bearing/telemetry
+topic write iiot/line1/bearing/status
+user sensor_current
+topic write iiot/line1/current/telemetry
+topic write iiot/line1/current/status
+user sensor_parts
+topic write iiot/line1/parts/telemetry
+topic write iiot/line1/parts/status
+user sensor_machine
+topic write iiot/line1/machine/telemetry
+topic write iiot/line1/machine/status
+user actuator_tower
+topic read iiot/line1/tower/set
+topic write iiot/line1/tower/state
+topic write iiot/line1/tower/status
+user actuator_estop
+topic read iiot/line1/estop/set
+topic write iiot/line1/estop/state
+topic write iiot/line1/estop/status
+user openhab
+topic read iiot/line1/+/telemetry
+topic read iiot/line1/+/status
+topic read iiot/line1/+/state
+topic write iiot/line1/tower/set
+topic write iiot/line1/estop/set
+user admin
+topic readwrite iiot/line1/#

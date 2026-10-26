@@ -1,0 +1,49 @@
+name: iiot-variant4
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0.22
+    restart: unless-stopped
+    ports: ['127.0.0.1:8883:8883']
+    volumes:
+      - ./mosquitto/config:/mosquitto/config:ro
+      - ./certs/ca.crt:/mosquitto/certs/ca.crt:ro
+      - ./certs/server.crt:/mosquitto/certs/server.crt:ro
+      - ./certs/server.key:/mosquitto/certs/server.key:ro
+    command: ['mosquitto','-c','/mosquitto/config/mosquitto.conf']
+  plc:
+    build: ./simulator
+    restart: unless-stopped
+    environment: {SHIFT_REAL_SECONDS: '120'}
+    command: ['python','plc.py']
+    volumes: ['./control:/control']
+  gateway:
+    build: ./simulator
+    restart: unless-stopped
+    depends_on: [plc,mosquitto]
+    env_file: .env
+    command: ['python','gateway.py']
+    volumes: ['./certs/ca.crt:/certs/ca.crt:ro']
+  actuators:
+    build: ./simulator
+    restart: unless-stopped
+    depends_on: [mosquitto]
+    env_file: .env
+    command: ['python','actuators.py']
+    volumes: ['./certs/ca.crt:/certs/ca.crt:ro','./control:/control']
+  openhab:
+    image: openhab/openhab:5.0.0-debian
+    restart: unless-stopped
+    depends_on: [mosquitto]
+    ports: ['127.0.0.1::8080']
+    environment:
+      TZ: Europe/Kyiv
+      CRYPTO_POLICY: unlimited
+      EXTRA_JAVA_OPTS: '-Djavax.net.ssl.trustStore=/certs/truststore.p12 -Djavax.net.ssl.trustStoreType=PKCS12 -Djavax.net.ssl.trustStorePassword=changeit'
+    volumes:
+      - ./openhab/conf:/openhab/conf
+      - openhab_data:/openhab/userdata
+      - openhab_addons:/openhab/addons
+      - ./certs/truststore.p12:/certs/truststore.p12:ro
+volumes:
+  openhab_data:
+  openhab_addons:

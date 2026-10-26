@@ -1,0 +1,7 @@
+Strategies {
+    everyMinute : "0 * * * * ?"
+}
+
+Items {
+    Vibration, BearingTemp, MotorCurrent, PartsTotal, PartsShift, ShiftDowntime, ShiftEfficiency : strategy = everyChange, everyMinute
+}

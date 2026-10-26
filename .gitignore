@@ -1,0 +1,10 @@
+.env
+certs/*
+!certs/generate.sh
+mosquitto/config/passwd
+openhab/conf/things/factory.things
+control/*.json
+control/*.tmp
+__pycache__/
+*.pyc
+.venv/

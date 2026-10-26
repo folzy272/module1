@@ -1,0 +1,24 @@
+Number Vibration "Вібрація [%.2f мм/с]" {channel="mqtt:topic:factory:factory:vibration"}
+Number BearingTemp "Температура підшипника [%.1f °C]" {channel="mqtt:topic:factory:factory:bearing"}
+Number MotorCurrent "Струм двигуна [%.1f A]" {channel="mqtt:topic:factory:factory:current"}
+Number PartsTotal "Виготовлено загалом [%.0f]" {channel="mqtt:topic:factory:factory:parts"}
+Number PartsShift "Деталі за зміну [%.0f]" {channel="mqtt:topic:factory:factory:partsShift"}
+Number ShiftId "Номер зміни [%.0f]" {channel="mqtt:topic:factory:factory:shiftId"}
+String MachineState "Стан верстата [%s]" {channel="mqtt:topic:factory:factory:machineState"}
+Number ShiftDowntime "Простій за зміну [%.1f хв]" {channel="mqtt:topic:factory:factory:downtime"}
+String TowerColor "Сигнальна колона [%s]" {channel="mqtt:topic:factory:factory:tower"}
+Switch EmergencyStop "Аварійний STOP [%s]" {channel="mqtt:topic:factory:factory:estop"}
+String VibStatus "Статус вібрації [%s]" {channel="mqtt:topic:factory:factory:vibrationStatus"}
+String BearingStatus "Статус підшипника [%s]" {channel="mqtt:topic:factory:factory:bearingStatus"}
+String CurrentStatus "Статус струму [%s]" {channel="mqtt:topic:factory:factory:currentStatus"}
+String PartsStatus "Статус лічильника [%s]" {channel="mqtt:topic:factory:factory:partsStatus"}
+String MachineStatus "Статус верстата [%s]" {channel="mqtt:topic:factory:factory:machineStatus"}
+String TowerStatus "Статус колони [%s]" {channel="mqtt:topic:factory:factory:towerStatus"}
+String EstopStatus "Статус STOP [%s]" {channel="mqtt:topic:factory:factory:estopStatus"}
+Number WarningThreshold "Попереджувальний поріг [%.1f мм/с]"
+Number CriticalThreshold "Аварійний поріг [%.1f мм/с]"
+Switch VibrationAlarm "Вібрація — тривога [%s]"
+Switch LubricationAlarm "Перевірити змащення [%s]"
+String AlarmMessage "Повідомлення [%s]"
+String ShiftSummary "Підсумок зміни [%s]"
+Number ShiftEfficiency "Виконання плану [%.0f %%]"
